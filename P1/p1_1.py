@@ -6,9 +6,10 @@
 ### 对比java中需要提前声明，类似下面两行
 ### int a;
 ### a = 42;
+# 新增
 a = 42
-print(a)  # 输出: 42，print是python自带的方法，可以将入参打印在console控制台
-
+p = print
+p(a)  # 输出: 42，print是python自带的方法，可以将入参打印在console控制台
 ## 浮点数
 b = 3.14
 print(b)  # 输出: 3.14
@@ -34,13 +35,21 @@ else:
     print("成年人")
 
 # 上方的可重构为
-newAge = 18
+newAge = -1
 if newAge < 18:
     print("未成年")
 if age == 18:
     print("刚好成年")
 if newAge > 18:
     print("成年人")
+# 抛出异常值
+try:
+    if newAge < 0:
+        raise ValueError("异常啦")
+except ZeroDivisionError as e:
+    print(e)
+except ValueError as e:
+    print(e)
 
 
 # 3. 循环
@@ -69,29 +78,40 @@ while count < 5:
 # 例如定义一个函数，计算一组数的标准差
 def calculate_std_dev(data):
     n = len(data)
-    if n < 2:
-        raise ValueError("The list must contain at least two values to compute the standard deviation.")
+    # if n < 2:
+    #     raise ValueError("The list must contain at least two values to compute the standard deviation.")
 
     mean = sum(data) / n
-    variance = sum((x - mean) ** 2 for x in data) / (n - 1)  # 使用n-1是为了得到样本标准差
-    std_dev = variance ** 0.5
-    return std_dev
+    sum_x = 0
+    for x in data:
+        sum_x = sum_x + (x - mean) ** 2
+    try:
+        var_value = sum_x/(n-1)
+    except ZeroDivisionError as e:
+        return None
+    std_value = var_value ** 0.5
+
+    # variance = sum((x - mean) ** 2 for x in data) / (n - 1)  # 使用n-1是为了得到样本标准差
+    # std_dev = variance ** 0.5
+    return std_value
 
 # 示例数据
-data_list = [1, 2, 3, 4, 5]
-std_dev = calculate_std_dev(data_list)
-print(f"手动计算的标准差: {std_dev}")
-
+try:
+    data_list = [1]
+    std_dev = calculate_std_dev(data_list)
+    print(f"手动计算的标准差: {std_dev}")
+except ValueError as e:
+    print(e)
 # 如果使用numpy库，直接调用函数即可
 import numpy as np
 
 # 示例数据
-data_list = [1, 2, 3, 4, 5]
+data_list = [1,2,3,4,5]
 std_dev = np.std(data_list, ddof=1)  # 设置ddof=1以获得样本标准差
 print(f"使用numpy计算的标准差: {std_dev}")
 
 ### 5. 列表生成器，可以用for循环代替，先了解，熟练后尝试使用。
-squares = [x**2 for x in range(10)]
+squares = [lambda x:x**2 for x in range(10)]
 print(squares)  # 输出: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 ### 6. 异常处理，是为了让程序在出现异常时可以让我们通过代码处理，然后让代码继续执行
@@ -103,6 +123,7 @@ try:
     result = 10 / 0
 except ZeroDivisionError as e:
     # 这个ZeroDivisionError不是随便写的，这个是python中会抛出的异常，基本上抛出异常时都会有对应的异常名称
+    print("错误："+str(e))
     print(f"错误: {e}")
 finally:
     print("执行完毕")
